@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modelo Piloto HC-100 - Javier Muñoz</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #0f172a; color: #e2e8f0; font-family: 'Segoe UI', Roboto, sans-serif; overflow: hidden; }
+        .gradient-text { background: linear-gradient(to right, #fbbf24, #3b82f6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .glass-panel { background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.1); }
+        #canvas-container { width: 100vw; height: 100vh; position: absolute; top: 0; left: 0; z-index: 1; background: radial-gradient(circle at center, #1e293b 0%, #020617 100%); }
+    </style>
+</head>
+<body class="antialiased text-base 2xl:text-2xl"> <nav class="fixed top-0 w-full z-50 glass-panel p-4 2xl:p-6 flex justify-between items-center shadow-lg pointer-events-none">
+        <div class="font-bold text-xl 2xl:text-3xl tracking-tighter text-white pointer-events-auto">GEA<span class="text-yellow-400">MET</span></div>
+        <div class="text-xs 2xl:text-lg text-gray-400 hidden sm:block pointer-events-auto">
+            <span class="text-white font-bold">Javier Muñoz Ambiado</span> | Seminario Integrativo
+        </div>
+    </nav>
+
+    <div class="fixed top-20 left-6 2xl:top-32 2xl:left-10 z-40 max-w-md 2xl:max-w-3xl pointer-events-none" data-aos="fade-right">
+        <h1 class="text-5xl 2xl:text-7xl font-bold mb-3 leading-tight drop-shadow-lg">
+            Piloto <span class="gradient-text">HC-100</span>
+        </h1>
+        <p class="text-sm 2xl:text-xl text-gray-200 bg-slate-900/80 p-4 2xl:p-6 rounded-lg border-l-4 border-yellow-500 shadow-xl backdrop-blur-sm hidden md:block">
+            Ingeniería de detalle para caracterización cinética.<br>
+            Comparación simultánea: Ciclo Seco vs. Húmedo.
+        </p>
+    </div>
+
+    <div class="fixed bottom-8 left-6 2xl:bottom-12 2xl:left-10 z-40 bg-slate-950/90 p-5 2xl:p-8 rounded-xl border border-slate-600 shadow-2xl pointer-events-auto min-w-[300px] 2xl:min-w-[450px]" data-aos="fade-up">
+        
+        <h3 class="font-bold text-white mb-2 2xl:mb-4 border-b border-gray-600 pb-1 text-xs 2xl:text-lg uppercase tracking-wider">1. Tipos de Relave (5 Muestras)</h3>
+        <div class="grid grid-cols-5 gap-2 mb-4 text-center text-[10px] 2xl:text-sm text-gray-400">
+            <div><div class="w-5 h-5 2xl:w-8 2xl:h-8 mx-auto rounded-full bg-[#854d0e] border border-gray-500 shadow-sm mb-1"></div>M-01</div>
+            <div><div class="w-5 h-5 2xl:w-8 2xl:h-8 mx-auto rounded-full bg-[#57534e] border border-gray-500 shadow-sm mb-1"></div>M-02</div>
+            <div><div class="w-5 h-5 2xl:w-8 2xl:h-8 mx-auto rounded-full bg-[#9f1239] border border-gray-500 shadow-sm mb-1"></div>M-03</div>
+            <div><div class="w-5 h-5 2xl:w-8 2xl:h-8 mx-auto rounded-full bg-[#ca8a04] border border-gray-500 shadow-sm mb-1"></div>M-04</div>
+            <div><div class="w-5 h-5 2xl:w-8 2xl:h-8 mx-auto rounded-full bg-[#365314] border border-gray-500 shadow-sm mb-1"></div>M-05</div>
+        </div>
+
+        <h3 class="font-bold text-white mb-2 2xl:mb-4 border-b border-gray-600 pb-1 text-xs 2xl:text-lg uppercase tracking-wider">2. Red de Fluidos</h3>
+        <div class="grid grid-cols-1 gap-y-1 2xl:gap-y-2 mb-4 text-[11px] 2xl:text-base text-gray-300">
+            <div class="flex items-center gap-2"><div class="w-6 h-1 2xl:h-2 bg-yellow-400 border border-yellow-600 shadow-[0_0_5px_#facc15]"></div>Aire Principal (Inyección)</div>
+            <div class="flex items-center gap-2"><div class="w-6 h-1 2xl:h-2 bg-green-500 shadow-[0_0_5px_#22c55e]"></div>Aire Húmedo (>95% HR)</div>
+            <div class="flex items-center gap-2"><div class="w-6 h-1 2xl:h-2 bg-orange-500 shadow-[0_0_5px_#f97316]"></div>Aire Seco (Filtrado)</div>
+            <div class="flex items-center gap-2"><div class="w-6 h-1 2xl:h-2 bg-blue-500 shadow-[0_0_5px_#3b82f6]"></div>Agua Destilada</div>
+        </div>
+
+        <h3 class="font-bold text-white mb-2 2xl:mb-4 border-b border-gray-600 pb-1 text-xs 2xl:text-lg uppercase tracking-wider">3. Componentes</h3>
+        <div class="grid grid-cols-2 gap-x-2 gap-y-2 text-[11px] 2xl:text-base text-gray-300">
+            <div class="flex items-center gap-2"><div class="w-2 h-2 2xl:w-3 2xl:h-3 rounded-sm bg-[#1d4ed8] border border-white"></div>Buffer 100L</div>
+            <div class="flex items-center gap-2"><div class="w-2 h-2 2xl:w-3 2xl:h-3 rounded-sm bg-[#22d3ee] shadow-[0_0_3px_#22d3ee]"></div>Humidificador</div>
+            <div class="flex items-center gap-2"><div class="w-2 h-2 2xl:w-3 2xl:h-3 rounded-sm bg-[#f97316]"></div>Filtro Seco</div>
+            <div class="flex items-center gap-2"><div class="w-2 h-2 2xl:w-3 2xl:h-3 border border-white opacity-50"></div>Cámara Plenum</div>
+        </div>
+    </div>
+
+    <div id="canvas-container">
+        <div class="absolute bottom-4 right-4 z-10 text-xs 2xl:text-lg font-semibold text-gray-500 bg-slate-900/50 p-3 rounded pointer-events-none">
+            Clic para pausar rotación | Rueda para Zoom
+        </div>
+    </div>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+        const container = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x020617, 0.008); 
+
+        // CAMARA AJUSTADA (Más cerca para que se vea grande en 2K)
+        const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+        camera.position.set(-20, 12, 22); // Zoom inicial más agresivo
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        renderer.setPixelRatio(window.devicePixelRatio); // Importante para 2K
+        container.appendChild(renderer.domElement);
+
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.target.set(0, 5, 0); 
+        controls.autoRotate = true;
+        controls.autoRotateSpeed = 1.0; 
+
+        // LUCES (Ajustadas para brillo)
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        scene.add(ambientLight);
+
+        const dirLight = new THREE.DirectionalLight(0xffffff, 1.2);
+        dirLight.position.set(15, 25, 15);
+        dirLight.castShadow = true;
+        dirLight.shadow.mapSize.width = 2048; // Sombra HD
+        dirLight.shadow.mapSize.height = 2048;
+        scene.add(dirLight);
+
+        const shelfLight = new THREE.PointLight(0xffffff, 1.5, 30);
+        shelfLight.position.set(0, 8, 8); 
+        scene.add(shelfLight);
+        
+        const rimLight = new THREE.SpotLight(0x3b82f6, 2.5);
+        rimLight.position.set(0, 20, -10);
+        rimLight.lookAt(0, 5, 0);
+        scene.add(rimLight);
+
+        // MATERIALES
+        const rackMat = new THREE.MeshStandardMaterial({ color: 0x475569, roughness: 0.3, metalness: 0.5 }); 
+        const acrylicMat = new THREE.MeshPhysicalMaterial({ 
+            color: 0xffffff, transmission: 0.98, transparent: true, opacity: 0.2, 
+            roughness: 0, metalness: 0, side: THREE.DoubleSide, clearcoat: 1.0 
+        });
+        
+        const tailingColors = [0x854d0e, 0x57534e, 0x9f1239, 0xca8a04, 0x365314];
+        const tailingMats = tailingColors.map(c => new THREE.MeshStandardMaterial({ color: c, roughness: 1, bumpScale: 0.2 }));
+
+        const blueDrumMat = new THREE.MeshStandardMaterial({ color: 0x1d4ed8, roughness: 0.2, metalness: 0.3 }); 
+        const plasticMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.6 }); 
+        const whiteDrumMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.3 }); 
+        const filterMat = new THREE.MeshStandardMaterial({ color: 0xf97316 }); 
+        const humidifierMat = new THREE.MeshStandardMaterial({ color: 0x22d3ee, emissive: 0x0ea5e9, emissiveIntensity: 0.3 }); // Más brillo
+        const bottleMat = new THREE.MeshPhysicalMaterial({ color: 0xfef08a, transmission: 0.8, transparent: true, opacity: 0.7 });
+
+        const labGroup = new THREE.Group();
+
+        function buildRack() {
+            const shelfGeo = new THREE.BoxGeometry(18, 0.2, 4); 
+            const postGeo = new THREE.CylinderGeometry(0.15, 0.15, 12, 16);
+            [0.5, 5.5, 10.5].forEach(y => {
+                const shelf = new THREE.Mesh(shelfGeo, rackMat);
+                shelf.position.y = y;
+                shelf.receiveShadow = true;
+                labGroup.add(shelf);
+            });
+            [[-8.8, -1.8], [8.8, -1.8], [-8.8, 1.8], [8.8, 1.8]].forEach(pos => {
+                const post = new THREE.Mesh(postGeo, rackMat);
+                post.position.set(pos[0], 6, pos[1]);
+                post.castShadow = true;
+                labGroup.add(post);
+            });
+        }
+        buildRack();
+
+        function createDetailedCell(x, z, materialIndex) {
+            const cellGroup = new THREE.Group();
+            const radius = 1.0; 
+            const height = 3.5; 
+            
+            const tube = new THREE.Mesh(new THREE.CylinderGeometry(radius, radius, height, 32, 1, true), acrylicMat);
+            tube.position.y = height / 2;
+            cellGroup.add(tube);
+            
+            const topCap = new THREE.Mesh(new THREE.CylinderGeometry(radius + 0.1, radius + 0.1, 0.2, 32), plasticMat);
+            topCap.position.y = height + 0.1;
+            cellGroup.add(topCap);
+            const nipple = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 0.3), plasticMat);
+            nipple.position.set(0, height + 0.3, 0);
+            cellGroup.add(nipple);
+
+            const mesh = new THREE.Mesh(new THREE.CylinderGeometry(0.95, 0.95, 0.05, 32), new THREE.MeshBasicMaterial({color: 0x94a3b8, wireframe: true}));
+            mesh.position.y = 0.8; 
+            cellGroup.add(mesh);
+            
+            const sample = new THREE.Mesh(new THREE.CylinderGeometry(0.98, 0.98, 1.5, 32), tailingMats[materialIndex]);
+            sample.position.y = 0.8 + 0.75 + 0.02; 
+            cellGroup.add(sample);
+
+            const funnel = new THREE.Mesh(new THREE.CylinderGeometry(1.1, 0.2, 0.5, 32, 1, false), plasticMat);
+            funnel.position.y = -0.25; 
+            cellGroup.add(funnel);
+
+            const drain = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 3.5, 8), new THREE.MeshStandardMaterial({color: 0x94a3b8}));
+            drain.position.y = -2.0;
+            cellGroup.add(drain);
+
+            const bottle = new THREE.Mesh(new THREE.CylinderGeometry(0.6, 0.6, 1.5, 16), bottleMat);
+            bottle.position.y = -4.5; 
+            cellGroup.add(bottle);
+
+            cellGroup.position.set(x, 5.7, z); 
+            return cellGroup;
+        }
+
+        const whiteDrum = new THREE.Mesh(new THREE.CylinderGeometry(1.4, 1.4, 2.5, 32), whiteDrumMat);
+        whiteDrum.position.set(-8, 11.8, 0); 
+        labGroup.add(whiteDrum);
+        
+        const humidBox = new THREE.Mesh(new THREE.BoxGeometry(2, 1.5, 2), humidifierMat);
+        humidBox.position.set(8, 1.5, 0); 
+        labGroup.add(humidBox);
+        const humidNozzle = new THREE.Mesh(new THREE.CylinderGeometry(0.2,0.2,0.5), plasticMat);
+        humidNozzle.position.set(8.5, 2.3, 0); 
+        labGroup.add(humidNozzle);
+
+        const blueDrum = new THREE.Mesh(new THREE.CylinderGeometry(2.2, 2.2, 4.5, 32), blueDrumMat);
+        blueDrum.position.set(13, 2.25, 0); 
+        labGroup.add(blueDrum);
+        const bLid = new THREE.Mesh(new THREE.CylinderGeometry(2.3, 2.3, 0.1, 32), plasticMat);
+        bLid.position.set(13, 4.5, 0);
+        labGroup.add(bLid);
+
+        const filterBox = new THREE.Mesh(new THREE.BoxGeometry(1, 2, 1), filterMat);
+        filterBox.position.set(-1, 11.6, 0); 
+        labGroup.add(filterBox);
+
+        for(let i=0; i<5; i++){
+            const xPos = -5 + (i * 2.5);
+            const cL = createDetailedCell(xPos, -1.2, i);
+            labGroup.add(cL);
+            const cR = createDetailedCell(xPos, 1.2, i);
+            labGroup.add(cR);
+        }
+
+        function drawTube(points, color, thick=0.06) {
+            const path = new THREE.CatmullRomCurve3(points);
+            const mat = new THREE.MeshStandardMaterial({
+                color: color, roughness: 0.2, metalness: 0.4,
+                emissive: color, emissiveIntensity: 0.5 // + Brillo
+            });
+            const mesh = new THREE.Mesh(new THREE.TubeGeometry(path, 64, thick, 8, false), mat);
+            labGroup.add(mesh);
+        }
+
+        // Tuberias
+        drawTube([new THREE.Vector3(-8, 10.5, 0), new THREE.Vector3(-8, 10.5, 2.5), new THREE.Vector3(-8, 1.5, 2.5), new THREE.Vector3(8, 1.5, 2.5), new THREE.Vector3(8, 1.5, 1)], 0x3b82f6, 0.08);
+        drawTube([new THREE.Vector3(9, 2, 0), new THREE.Vector3(11, 2, 0)], 0x22d3ee, 0.1);
+        drawTube([new THREE.Vector3(13, 4.6, 0), new THREE.Vector3(13, 13, 0), new THREE.Vector3(0, 13, 0)], 0xfacc15, 0.12);
+
+        const centerPoint = new THREE.Vector3(0, 13, 0);
+        drawTube([centerPoint, new THREE.Vector3(0, 13, 1.2), new THREE.Vector3(0, 10.5, 1.2)], 0x4ade80);
+        drawTube([new THREE.Vector3(-5, 10.5, 1.2), new THREE.Vector3(5, 10.5, 1.2)], 0x4ade80, 0.08); 
+        for(let i=0; i<5; i++){
+            const x = -5 + (i*2.5);
+            drawTube([new THREE.Vector3(x, 10.5, 1.2), new THREE.Vector3(x, 9.4, 1.2)], 0x4ade80, 0.04);
+        }
+
+        drawTube([centerPoint, new THREE.Vector3(-1, 13, 0), new THREE.Vector3(-1, 12.6, 0)], 0xf97316); 
+        drawTube([new THREE.Vector3(-1, 10.6, 0), new THREE.Vector3(-1, 10.5, 0), new THREE.Vector3(-1, 10.5, -1.2)], 0xf97316);
+        drawTube([new THREE.Vector3(-5, 10.5, -1.2), new THREE.Vector3(5, 10.5, -1.2)], 0xf97316, 0.08); 
+        for(let i=0; i<5; i++){
+            const x = -5 + (i*2.5);
+            drawTube([new THREE.Vector3(x, 10.5, -1.2), new THREE.Vector3(x, 9.4, -1.2)], 0xf97316, 0.04);
+        }
+
+        scene.add(labGroup);
+
+        const floor = new THREE.Mesh(new THREE.PlaneGeometry(100, 100), new THREE.MeshStandardMaterial({ color: 0x020617, roughness: 0.8 }));
+        floor.rotation.x = -Math.PI / 2;
+        scene.add(floor);
+
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            renderer.render(scene, camera);
+        }
+        window.addEventListener('resize', () => {
+            camera.aspect = container.clientWidth / container.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(container.clientWidth, container.clientHeight);
+        });
+        animate();
+        AOS.init();
+    </script>
+</body>
+</html>
