@@ -2,10 +2,21 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Piloto HC-100 | Javier Muñoz Ambiado</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Piloto HC-2026 | Javier Muñoz (Smart v45)</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    screens: {
+                        '3xl': '2200px', // Nuevo breakpoint para 2K/4K real
+                    }
+                }
+            }
+        }
+    </script>
     
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
@@ -28,6 +39,7 @@
             overflow: hidden;
             font-family: 'Roboto', sans-serif;
             cursor: default; 
+            -webkit-tap-highlight-color: transparent;
         }
 
         h1, h2, h3, h4 { font-family: 'Montserrat', sans-serif; }
@@ -37,116 +49,155 @@
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.6);
+            transition: all 0.3s ease-in-out;
         }
 
         .legend-item {
             transition: all 0.2s ease-out;
             border-radius: 6px;
-            padding: 6px 10px;
+            padding: 4px 6px;
         }
         
-        .legend-item:hover {
-            background-color: rgba(255, 255, 255, 0.08);
-            transform: translateX(5px);
-            border-left: 3px solid #facc15;
+        @media (hover: hover) {
+            .legend-item:hover {
+                background-color: rgba(255, 255, 255, 0.08);
+                transform: translateX(5px);
+                border-left: 3px solid #facc15;
+            }
         }
 
         .neon-dot {
-            width: 14px; height: 14px;
+            width: 10px; height: 10px; 
             border-radius: 50%;
             display: inline-block;
             box-shadow: 0 0 8px currentColor;
-            transition: transform 0.3s ease;
         }
 
-        .legend-item:hover .neon-dot { transform: scale(1.3); }
-
-        @media (min-width: 1920px) {
+        /* Solo aplica estilos gigantes si supera los 2200px (3xl) */
+        @media (min-width: 2200px) {
             .glass-panel { border-width: 2px; }
-            .neon-dot { width: 18px; height: 18px; }
+            .neon-dot { width: 16px; height: 16px; }
+            .legend-item { padding: 6px 10px; }
         }
         
         #tooltip {
             position: absolute; opacity: 0; pointer-events: none; z-index: 100;
             transition: opacity 0.15s ease-out, transform 0.15s ease-out;
-            transform: translate(20px, 20px);
+        }
+
+        /* Scrollbar fina */
+        .custom-scroll::-webkit-scrollbar { width: 4px; }
+        .custom-scroll::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); }
+        .custom-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); border-radius: 2px; }
+
+        /* Estado minimizado de la leyenda */
+        .legend-minimized {
+            width: 50px !important;
+            height: 50px !important;
+            padding: 0 !important;
+            overflow: hidden;
+            border-radius: 50% !important;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .legend-minimized * { display: none; } /* Oculta contenido interno */
+        .legend-minimized::after {
+            content: '📋'; /* Icono cuando está cerrado */
+            font-size: 24px;
+            display: block;
         }
     </style>
 </head>
 <body class="antialiased select-none">
 
-    <div id="tooltip" class="glass-panel p-6 rounded-xl border-l-8 border-cyan-500 max-w-md 2xl:max-w-xl">
-        <h4 id="tt-title" class="text-cyan-400 font-extrabold text-xl 2xl:text-3xl mb-2 tracking-wide uppercase shadow-black drop-shadow-md">OBJETO</h4>
-        <div class="h-0.5 bg-gray-600 w-full mb-3"></div>
-        <p id="tt-desc" class="text-gray-200 text-base 2xl:text-xl font-light leading-relaxed">Descripción técnica...</p>
+    <div id="tooltip" class="glass-panel p-4 3xl:p-6 rounded-xl border-l-4 3xl:border-l-8 border-cyan-500 max-w-[200px] md:max-w-xs 3xl:max-w-xl pointer-events-none">
+        <h4 id="tt-title" class="text-cyan-400 font-extrabold text-sm 3xl:text-3xl mb-1 3xl:mb-2 tracking-wide uppercase shadow-black drop-shadow-md">OBJETO</h4>
+        <div class="h-0.5 bg-gray-600 w-full mb-2 3xl:mb-3"></div>
+        <p id="tt-desc" class="text-gray-200 text-xs 3xl:text-xl font-light leading-relaxed">Descripción...</p>
     </div>
 
-    <div class="fixed top-10 left-10 z-50 glass-panel rounded-r-2xl border-l-8 border-yellow-500 p-8 2xl:p-10 max-w-xl 2xl:max-w-3xl pointer-events-auto" data-aos="fade-right" data-aos-duration="1000">
+    <div class="fixed top-0 left-0 md:top-6 md:left-6 3xl:top-10 3xl:left-10 z-40 glass-panel w-full md:w-auto md:rounded-r-2xl border-b-4 md:border-b-0 md:border-l-8 border-yellow-500 p-4 3xl:p-10 max-w-none md:max-w-md 3xl:max-w-3xl pointer-events-auto shadow-lg">
+        <div class="flex justify-between items-center md:block">
+            <div>
+                <h1 class="text-2xl md:text-3xl 3xl:text-7xl font-black text-white mb-0 3xl:mb-1 tracking-tighter">LABORATORIO</h1>
+                <h2 class="text-xs md:text-lg 3xl:text-4xl font-bold text-yellow-400 mb-0 3xl:mb-6">Piloto HC-2026</h2>
+            </div>
+            <a href="https://www.linkedin.com/in/jmunoz-ambiado" target="_blank" class="md:hidden bg-blue-700 text-white p-2 rounded-full">
+                <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+            </a>
+        </div>
         
-        <h1 class="text-5xl 2xl:text-7xl font-black text-white mb-1 tracking-tighter">LABORATORIO</h1>
-        <h2 class="text-2xl 2xl:text-4xl font-bold text-yellow-400 mb-6">Piloto HC-2026</h2>
-        
-        <div class="border-l-2 border-gray-600 pl-4 mb-6 space-y-1">
-            <p class="text-white font-bold text-sm 2xl:text-lg uppercase tracking-wider">Seminario Integrativo</p>
-            <p class="text-gray-400 text-xs 2xl:text-base font-light">Magíster en Mineralogía Aplicada a la Geometalurgia</p>
-            <p class="text-gray-400 text-xs 2xl:text-base font-light">Universidad de Concepción</p>
+        <div class="hidden md:block border-l-2 border-gray-600 pl-4 mb-2 3xl:mb-6 space-y-1 mt-2 3xl:mt-4">
+            <p class="text-white font-bold text-[10px] 3xl:text-lg uppercase tracking-wider">Seminario Integrativo</p>
+            <p class="text-gray-400 text-[10px] 3xl:text-base font-light">Magíster en Geometalurgia UdeC</p>
         </div>
 
-        <div class="flex flex-col items-start gap-2 pt-4 border-t border-gray-700">
-            <span class="text-gray-200 font-medium text-sm 2xl:text-lg">Desarrollado por: <strong class="text-white">Javier Muñoz Ambiado</strong></span>
-            
-            <a href="https://www.linkedin.com/in/jmunoz-ambiado" target="_blank" class="flex items-center gap-2 bg-blue-700 hover:bg-blue-600 text-white px-4 py-2 rounded-md transition-all text-xs 2xl:text-sm font-bold shadow-lg hover:shadow-blue-500/30">
-                <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
-                Ver Perfil LinkedIn
+        <div class="hidden md:flex flex-col items-start gap-2 pt-2 3xl:pt-4 border-t border-gray-700">
+            <span class="text-gray-200 font-medium text-xs 3xl:text-lg">Por: <strong class="text-white">Javier Muñoz A.</strong></span>
+            <a href="https://www.linkedin.com/in/jmunoz-ambiado" target="_blank" class="flex items-center gap-2 bg-blue-700 hover:bg-blue-600 text-white px-3 py-1 3xl:px-4 3xl:py-2 rounded-md transition-all text-[10px] 3xl:text-sm font-bold">
+                <svg class="w-3 h-3 3xl:w-4 3xl:h-4 fill-current" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+                LinkedIn
             </a>
         </div>
     </div>
 
-    <div class="fixed bottom-10 left-10 z-50 glass-panel rounded-xl p-8 2xl:p-10 min-w-[320px] 2xl:min-w-[450px] pointer-events-auto transition-all duration-300 hover:shadow-[0_0_40px_rgba(250,204,21,0.15)]" data-aos="fade-up">
+    <button id="btn-legend-mobile-toggle" class="md:hidden fixed bottom-24 left-4 z-50 glass-panel p-3 rounded-full text-white shadow-lg border border-yellow-500">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+        </svg>
+    </button>
+
+    <div id="legend-panel" class="fixed bottom-0 left-0 md:bottom-6 md:left-6 3xl:bottom-10 3xl:left-10 z-50 glass-panel rounded-t-xl md:rounded-xl p-5 3xl:p-10 w-full md:w-64 3xl:min-w-[450px] 3xl:w-auto pointer-events-auto transform translate-y-full md:translate-y-0 max-h-[60vh] md:max-h-[85vh] overflow-y-auto custom-scroll transition-all duration-300">
         
-        <div class="mb-6">
-            <h3 class="text-xs 2xl:text-sm font-bold text-yellow-500 uppercase tracking-widest mb-3 border-b border-gray-600 pb-1">
-                1. Muestras (Relaves)
-            </h3>
-            <div class="grid grid-cols-1 gap-1 2xl:gap-2 text-sm 2xl:text-lg font-medium text-gray-200">
-                <div class="legend-item flex items-center"><span class="w-4 h-4 2xl:w-5 2xl:h-5 rounded-full mr-3 border border-white/30" style="background-color: #9f1239;"></span>Muestra 1 (Rojo Arcilloso)</div>
-                <div class="legend-item flex items-center"><span class="w-4 h-4 2xl:w-5 2xl:h-5 rounded-full mr-3 border border-white/30" style="background-color: #ca8a04;"></span>Muestra 2 (Amarillo Ocre)</div>
-                <div class="legend-item flex items-center"><span class="w-4 h-4 2xl:w-5 2xl:h-5 rounded-full mr-3 border border-white/30" style="background-color: #365314;"></span>Muestra 3 (Verde Oxidado)</div>
-                <div class="legend-item flex items-center"><span class="w-4 h-4 2xl:w-5 2xl:h-5 rounded-full mr-3 border border-white/30" style="background-color: #57534e;"></span>Muestra 4 (Gris Pizarra)</div>
-                <div class="legend-item flex items-center"><span class="w-4 h-4 2xl:w-5 2xl:h-5 rounded-full mr-3 border border-white/30" style="background-color: #854d0e;"></span>Muestra 5 (Café Tierra)</div>
-            </div>
-        </div>
+        <button id="btn-minimize" class="hidden md:block absolute top-2 right-2 text-gray-400 hover:text-white" title="Minimizar Leyenda">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path></svg>
+        </button>
 
-        <div class="mb-6">
-            <h3 class="text-xs 2xl:text-sm font-bold text-yellow-500 uppercase tracking-widest mb-3 border-b border-gray-600 pb-1">
-                2. Red de Fluidos
-            </h3>
-            <div class="grid grid-cols-1 gap-1 2xl:gap-2 text-sm 2xl:text-lg font-medium text-gray-200">
-                <div class="legend-item flex items-center group"><span class="neon-dot text-blue-500 mr-4" style="background-color: #2563eb;"></span>Agua Desionizada</div>
-                <div class="legend-item flex items-center group"><span class="neon-dot text-cyan-200 mr-4" style="background-color: #a5f3fc;"></span>Niebla Ultrasónica</div>
-                <div class="legend-item flex items-center group"><span class="neon-dot text-green-400 mr-4" style="background-color: #4ade80;"></span>Aire Húmedo (>95%)</div>
-                <div class="legend-item flex items-center group"><span class="neon-dot text-orange-500 mr-4" style="background-color: #fb923c;"></span>Aire Seco (<10%)</div>
-            </div>
-        </div>
+        <button id="btn-close-mobile" class="md:hidden absolute top-4 right-4 text-gray-400 hover:text-white">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
 
-        <div>
-            <h3 class="text-xs 2xl:text-sm font-bold text-yellow-500 uppercase tracking-widest mb-3 border-b border-gray-600 pb-1">
-                3. Equipos Críticos
-            </h3>
-            <div class="grid grid-cols-2 gap-2 text-sm 2xl:text-lg font-medium text-gray-300">
-                <div class="legend-item flex items-center"><span class="w-3 h-3 2xl:w-4 2xl:h-4 mr-3 bg-red-500 rounded-sm"></span>Manifold</div>
-                <div class="legend-item flex items-center"><span class="w-3 h-3 2xl:w-4 2xl:h-4 mr-3 bg-blue-900 rounded-sm border border-blue-500"></span>Buffer</div>
-                <div class="legend-item flex items-center"><span class="w-3 h-3 2xl:w-4 2xl:h-4 mr-3 bg-cyan-500 rounded-sm"></span>Humidificador</div>
-                <div class="legend-item flex items-center"><span class="w-3 h-3 2xl:w-4 2xl:h-4 mr-3 bg-orange-600 rounded-sm"></span>Filtro</div>
+        <div id="legend-content">
+            <div class="mb-3 3xl:mb-6">
+                <h3 class="text-[10px] 3xl:text-sm font-bold text-yellow-500 uppercase tracking-widest mb-2 3xl:mb-3 border-b border-gray-600 pb-1">1. Muestras (Relaves)</h3>
+                <div class="grid grid-cols-1 gap-1 text-xs 3xl:text-lg font-medium text-gray-200">
+                    <div class="legend-item flex items-center"><span class="w-3 h-3 3xl:w-5 3xl:h-5 rounded-full mr-2 3xl:mr-3 border border-white/30" style="background-color: #9f1239;"></span>Muestra 1 (Rojo)</div>
+                    <div class="legend-item flex items-center"><span class="w-3 h-3 3xl:w-5 3xl:h-5 rounded-full mr-2 3xl:mr-3 border border-white/30" style="background-color: #ca8a04;"></span>Muestra 2 (Ocre)</div>
+                    <div class="legend-item flex items-center"><span class="w-3 h-3 3xl:w-5 3xl:h-5 rounded-full mr-2 3xl:mr-3 border border-white/30" style="background-color: #365314;"></span>Muestra 3 (Verde)</div>
+                    <div class="legend-item flex items-center"><span class="w-3 h-3 3xl:w-5 3xl:h-5 rounded-full mr-2 3xl:mr-3 border border-white/30" style="background-color: #57534e;"></span>Muestra 4 (Gris)</div>
+                    <div class="legend-item flex items-center"><span class="w-3 h-3 3xl:w-5 3xl:h-5 rounded-full mr-2 3xl:mr-3 border border-white/30" style="background-color: #854d0e;"></span>Muestra 5 (Café)</div>
+                </div>
+            </div>
+
+            <div class="mb-3 3xl:mb-6">
+                <h3 class="text-[10px] 3xl:text-sm font-bold text-yellow-500 uppercase tracking-widest mb-2 3xl:mb-3 border-b border-gray-600 pb-1">2. Red de Fluidos</h3>
+                <div class="grid grid-cols-1 gap-1 text-xs 3xl:text-lg font-medium text-gray-200">
+                    <div class="legend-item flex items-center"><span class="neon-dot text-blue-500 mr-2 3xl:mr-4" style="background-color: #2563eb;"></span>Agua Desionizada</div>
+                    <div class="legend-item flex items-center"><span class="neon-dot text-cyan-200 mr-2 3xl:mr-4" style="background-color: #a5f3fc;"></span>Niebla Ultrasónica</div>
+                    <div class="legend-item flex items-center"><span class="neon-dot text-green-400 mr-2 3xl:mr-4" style="background-color: #4ade80;"></span>Aire Húmedo (>95%)</div>
+                    <div class="legend-item flex items-center"><span class="neon-dot text-orange-500 mr-2 3xl:mr-4" style="background-color: #fb923c;"></span>Aire Seco (<10%)</div>
+                </div>
+            </div>
+
+            <div>
+                <h3 class="text-[10px] 3xl:text-sm font-bold text-yellow-500 uppercase tracking-widest mb-2 3xl:mb-3 border-b border-gray-600 pb-1">3. Equipos Críticos</h3>
+                <div class="grid grid-cols-2 gap-1 3xl:gap-2 text-xs 3xl:text-lg font-medium text-gray-300">
+                    <div class="legend-item flex items-center"><span class="w-3 h-3 3xl:w-4 3xl:h-4 mr-2 bg-red-500 rounded-sm"></span>Manifold</div>
+                    <div class="legend-item flex items-center"><span class="w-3 h-3 3xl:w-4 3xl:h-4 mr-2 bg-blue-900 rounded-sm border border-blue-500"></span>Buffer</div>
+                    <div class="legend-item flex items-center"><span class="w-3 h-3 3xl:w-4 3xl:h-4 mr-2 bg-cyan-500 rounded-sm"></span>Humidificador</div>
+                    <div class="legend-item flex items-center"><span class="w-3 h-3 3xl:w-4 3xl:h-4 mr-2 bg-orange-600 rounded-sm"></span>Filtro</div>
+                </div>
             </div>
         </div>
     </div>
 
-    <button id="toggle-rotate" class="fixed bottom-10 right-10 z-50 glass-panel px-8 py-4 2xl:px-12 2xl:py-6 rounded-full text-white font-bold text-sm 2xl:text-xl flex items-center gap-3 transition-transform hover:-translate-y-1 hover:shadow-cyan-500/50 cursor-pointer pointer-events-auto">
-        <svg id="icon-pause" class="w-6 h-6 2xl:w-8 2xl:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-        <svg id="icon-play" class="w-6 h-6 2xl:w-8 2xl:h-8 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path></svg>
-        <span id="btn-text">PAUSAR ROTACIÓN</span>
+    <button id="toggle-rotate" class="fixed bottom-6 right-4 md:bottom-6 md:right-6 3xl:bottom-10 3xl:right-10 z-50 glass-panel px-4 py-3 3xl:px-12 3xl:py-6 rounded-full text-white font-bold text-xs 3xl:text-xl flex items-center gap-2 3xl:gap-3 transition-transform hover:-translate-y-1 cursor-pointer pointer-events-auto active:scale-95">
+        <svg id="icon-pause" class="w-4 h-4 3xl:w-8 3xl:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+        <svg id="icon-play" class="w-4 h-4 3xl:w-8 3xl:h-8 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path></svg>
+        <span id="btn-text" class="hidden md:inline">PAUSAR</span>
     </button>
 
     <div id="canvas-container" class="absolute inset-0 z-0"></div>
@@ -157,14 +208,54 @@
 
         AOS.init();
 
-        // 1. ESCENA
+        // --- LÓGICA DE INTERFAZ INTELIGENTE ---
+        const legendPanel = document.getElementById('legend-panel');
+        const btnMobileToggle = document.getElementById('btn-legend-mobile-toggle');
+        const btnCloseMobile = document.getElementById('btn-close-mobile');
+        const btnMinimize = document.getElementById('btn-minimize');
+
+        // Función para Móvil (Slide up/down)
+        function toggleMobileLegend() { 
+            legendPanel.classList.toggle('translate-y-full'); 
+        }
+
+        // Función para Desktop (Minimizar a burbuja)
+        function toggleDesktopLegend() {
+            legendPanel.classList.toggle('legend-minimized');
+        }
+
+        btnMobileToggle.addEventListener('click', toggleMobileLegend);
+        btnCloseMobile.addEventListener('click', toggleMobileLegend);
+        btnMinimize.addEventListener('click', toggleDesktopLegend);
+        
+        // Si hago click en la leyenda estando minimizada, la abro
+        legendPanel.addEventListener('click', (e) => {
+            if(legendPanel.classList.contains('legend-minimized')) {
+                toggleDesktopLegend();
+            }
+        });
+
         const scene = new THREE.Scene();
         const wallColor = 0xe6dfc3; 
         scene.background = new THREE.Color(wallColor); 
         scene.fog = new THREE.FogExp2(wallColor, 0.008); 
         
         const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.set(22, 18, 28);
+        
+        // Ajuste inteligente de cámara inicial para evitar solapamiento
+        function setCameraPos() {
+            if(window.innerWidth < 768) {
+                // Móvil: Lejos y alto
+                camera.position.set(28, 22, 35); 
+            } else if (window.innerWidth < 1600) {
+                // Laptop/FHD: Un poco a la derecha para liberar espacio a la izquierda (donde está la leyenda)
+                camera.position.set(20, 18, 30); 
+            } else {
+                // 2K/4K: Posición estándar
+                camera.position.set(22, 18, 28);
+            }
+        }
+        setCameraPos();
 
         const renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
@@ -174,7 +265,13 @@
         document.getElementById('canvas-container').appendChild(renderer.domElement);
 
         const controls = new OrbitControls(camera, renderer.domElement);
-        controls.target.set(0, 7, 0);
+        // Desplazamos el centro un poco a la derecha en pantallas chicas para que la leyenda no tape el modelo
+        if(window.innerWidth > 768 && window.innerWidth < 1900) {
+            controls.target.set(3, 7, 0); 
+        } else {
+            controls.target.set(0, 7, 0);
+        }
+        
         controls.enableDamping = true;
         controls.autoRotate = true;
         controls.autoRotateSpeed = 1.0;
@@ -183,27 +280,29 @@
         const iconPause = document.getElementById('icon-pause');
         const iconPlay = document.getElementById('icon-play');
         const btnText = document.getElementById('btn-text');
+        
+        let isRotating = true;
         btnRotate.addEventListener('click', () => {
-            controls.autoRotate = !controls.autoRotate;
-            if(controls.autoRotate) {
-                btnText.innerText = "PAUSAR ROTACIÓN";
+            isRotating = !isRotating;
+            controls.autoRotate = isRotating;
+            if(isRotating) {
+                btnText.innerText = "PAUSAR";
                 iconPause.classList.remove('hidden');
                 iconPlay.classList.add('hidden');
             } else {
-                btnText.innerText = "REANUDAR GIRO";
+                btnText.innerText = "GIRAR";
                 iconPause.classList.add('hidden');
                 iconPlay.classList.remove('hidden');
             }
         });
 
-        // 2. ILUMINACIÓN & SUELO
+        // ILUMINACIÓN, SUELO Y OBJETOS (Idéntico a v43/44)
         const ambient = new THREE.AmbientLight(0xffffff, 0.5); scene.add(ambient);
         const hemiLight = new THREE.HemisphereLight(0xffffff, 0x475569, 0.6); hemiLight.position.set(0, 20, 0); scene.add(hemiLight);
         const mainLight = new THREE.DirectionalLight(0xffffff, 1.2);
         mainLight.position.set(-20, 40, 30);
         mainLight.castShadow = true;
         mainLight.shadow.mapSize.width = 4096; mainLight.shadow.mapSize.height = 4096;
-        mainLight.shadow.bias = -0.0001; 
         scene.add(mainLight);
 
         const floorMat = new THREE.MeshStandardMaterial({ color: 0x475569, roughness: 0.6, metalness: 0.2 });
@@ -211,7 +310,6 @@
         floor.rotation.x = -Math.PI / 2; floor.position.y = -0.1; floor.receiveShadow = true;
         scene.add(floor);
 
-        // 3. MATERIALES
         const matRack = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.5 });
         const matAcrylic = new THREE.MeshPhysicalMaterial({ color: 0xffffff, transmission: 0.95, opacity: 0.1, transparent: true, roughness: 0.05 });
         const matWet = new THREE.MeshStandardMaterial({ color: 0x4ade80, emissive: 0x22c55e, emissiveIntensity: 0.5 }); 
@@ -220,8 +318,6 @@
         const matAstm = new THREE.MeshStandardMaterial({ color: 0x94a3b8, emissive: 0x475569, emissiveIntensity: 0.2 });
         const matWater = new THREE.MeshStandardMaterial({ color: 0x2563eb, emissive: 0x1d4ed8, emissiveIntensity: 0.4 });
         const matFog = new THREE.MeshPhysicalMaterial({ color: 0xa5f3fc, transmission: 0.4, opacity: 0.6, transparent: true });
-        const matYellow = new THREE.MeshStandardMaterial({ color: 0xfacc15 });
-        const matValve = new THREE.MeshStandardMaterial({ color: 0xff0000, emissive: 0x991b1b, emissiveIntensity: 0.4 });
         const tailingMats = [
             new THREE.MeshStandardMaterial({color: 0x9f1239}), new THREE.MeshStandardMaterial({color: 0xca8a04}), 
             new THREE.MeshStandardMaterial({color: 0x365314}), new THREE.MeshStandardMaterial({color: 0x57534e}), 
@@ -230,10 +326,8 @@
 
         const group = new THREE.Group();
         scene.add(group);
-
         function addMeta(mesh, name, desc) { mesh.userData = { isInteractive: true, name: name, desc: desc }; }
 
-        // --- CONSTRUCCIÓN ---
         const RACK_W = 22; const POST_X = 10.8;
         function buildRack() {
             const shelf = new THREE.BoxGeometry(RACK_W, 0.2, 5); const post = new THREE.CylinderGeometry(0.15,0.15,14,16);
@@ -243,33 +337,28 @@
         buildRack();
 
         const tank = new THREE.Mesh(new THREE.CylinderGeometry(1.5,1.5,3,32), new THREE.MeshStandardMaterial({color:0xffffff}));
-        tank.position.set(-7,13,0); tank.castShadow=true; addMeta(tank, "Tanque de Agua Destilada", "Suministro por gravedad para el lavado semanal. Permite analizar los lixiviados sin contaminantes externos."); group.add(tank);
+        tank.position.set(-7,13,0); tank.castShadow=true; addMeta(tank, "Tanque de Agua Destilada", "Suministro por gravedad para el lavado semanal."); group.add(tank);
 
         const BUFFER_X = 14; 
         const buffer = new THREE.Mesh(new THREE.CylinderGeometry(2,2,4.5,32), new THREE.MeshStandardMaterial({color:0x1e293b}));
-        buffer.position.set(BUFFER_X, 2.5, 2); buffer.castShadow=true; addMeta(buffer, "Buffer de Homogenización (100L)", "Estanque externo que estabiliza la presión y humedad del aire saturado antes de ser distribuido."); group.add(buffer);
+        buffer.position.set(BUFFER_X, 2.5, 2); buffer.castShadow=true; addMeta(buffer, "Buffer de Homogenización (100L)", "Estanque externo que estabiliza la presión y humedad."); group.add(buffer);
         
         const HUMID_X = 9.0; 
         const humid = new THREE.Mesh(new THREE.BoxGeometry(1.8, 1.5, 2), new THREE.MeshStandardMaterial({color:0x3b82f6}));
-        humid.position.set(HUMID_X, 1.25, 2); humid.castShadow=true; addMeta(humid, "Generador de Niebla", "Unidad ultrasónica interna. Transforma agua destilada en aerosol fino para saturar el aire."); group.add(humid);
+        humid.position.set(HUMID_X, 1.25, 2); humid.castShadow=true; addMeta(humid, "Generador de Niebla", "Unidad ultrasónica interna."); group.add(humid);
 
-        const fogPipe = new THREE.TubeGeometry(new THREE.CatmullRomCurve3([
-            new THREE.Vector3(HUMID_X + 0.9, 1.5, 2), new THREE.Vector3(12, 1.5, 2), new THREE.Vector3(BUFFER_X - 1.5, 3.5, 2)
-        ]), 64, 0.12, 8, false);
-        const fogMesh = new THREE.Mesh(fogPipe, matFog); addMeta(fogMesh, "Línea de Niebla", "Transporta aire saturado del generador interno al buffer externo."); group.add(fogMesh);
+        const fogPipe = new THREE.TubeGeometry(new THREE.CatmullRomCurve3([new THREE.Vector3(HUMID_X + 0.9, 1.5, 2), new THREE.Vector3(12, 1.5, 2), new THREE.Vector3(BUFFER_X - 1.5, 3.5, 2)]), 64, 0.12, 8, false);
+        const fogMesh = new THREE.Mesh(fogPipe, matFog); addMeta(fogMesh, "Línea de Niebla", "Transporta aire saturado al buffer."); group.add(fogMesh);
 
         const FAN_Y = 13; const FAN_Z = -1.5;
         const silica = new THREE.Mesh(new THREE.CylinderGeometry(0.7,0.7,3,32), new THREE.MeshStandardMaterial({color:0xd97706}));
-        silica.rotation.z=Math.PI/2; silica.position.set(15,FAN_Y,FAN_Z); silica.castShadow=true; addMeta(silica, "Columna de Secado (Sílica)", "Reduce la humedad relativa a <10% para simular condiciones de aridez extrema en el ciclo seco."); group.add(silica);
+        silica.rotation.z=Math.PI/2; silica.position.set(15,FAN_Y,FAN_Z); silica.castShadow=true; addMeta(silica, "Columna de Secado (Sílica)", "Reduce la humedad relativa a <10%."); group.add(silica);
         const fanOut = new THREE.Mesh(new THREE.BoxGeometry(1.2,1.2,1.2), new THREE.MeshStandardMaterial({color:0xfacc15}));
-        fanOut.position.set(12.5,FAN_Y,FAN_Z); fanOut.castShadow=true; addMeta(fanOut, "Extractor Centrífugo", "Garantiza el flujo constante de aire seco hacia el manifold, venciendo la resistencia del filtro."); group.add(fanOut);
+        fanOut.position.set(12.5,FAN_Y,FAN_Z); fanOut.castShadow=true; addMeta(fanOut, "Extractor Centrífugo", "Garantiza flujo constante de aire seco."); group.add(fanOut);
         const fanIn = new THREE.Mesh(new THREE.BoxGeometry(1.2,1.2,1.2), new THREE.MeshStandardMaterial({color:0xfacc15}));
         fanIn.position.set(17.5,FAN_Y,FAN_Z); fanIn.castShadow=true; group.add(fanIn);
 
-        function pipe(pts, mat) {
-            const geo = new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 64, 0.08, 8, false);
-            const m = new THREE.Mesh(geo, mat); m.castShadow=true; group.add(m);
-        }
+        function pipe(pts, mat) { const geo = new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 64, 0.08, 8, false); const m = new THREE.Mesh(geo, mat); m.castShadow=true; group.add(m); }
         pipe([new THREE.Vector3(-7,11.5,0), new THREE.Vector3(-7,1,0), new THREE.Vector3(-7,1,2), new THREE.Vector3(HUMID_X-1,1,2), new THREE.Vector3(HUMID_X-1,1.5,2)], matWater);
         const HEAD_Y = 12.5;
         pipe([new THREE.Vector3(BUFFER_X,4.8,2), new THREE.Vector3(BUFFER_X,HEAD_Y,2), new THREE.Vector3(BUFFER_X,HEAD_Y,1), new THREE.Vector3(-4,HEAD_Y,1)], matWet);
@@ -281,7 +370,7 @@
         pipe([new THREE.Vector3(-4,HEAD_Y,-1), new THREE.Vector3(-4,11.5,0)], matDry);
         pipe([new THREE.Vector3(-4,11.5,0), new THREE.Vector3(-4,10.8,0), new THREE.Vector3(-4,10.8,1.5)], matAstm);
         const valveBox = new THREE.Mesh(new THREE.BoxGeometry(0.8,0.8,0.8), new THREE.MeshStandardMaterial({color:0xef4444}));
-        valveBox.position.set(-4,11.5,0); addMeta(valveBox, "Selector Manual (3 Vías)", "Permite conmutar la línea ASTM completa entre Aire Seco o Aire Húmedo según el día del ciclo."); group.add(valveBox);
+        valveBox.position.set(-4,11.5,0); addMeta(valveBox, "Selector Manual", "Permite conmutar la línea ASTM completa."); group.add(valveBox);
 
         const headExp = new THREE.Mesh(new THREE.CylinderGeometry(0.12,0.12,12,32), matMix);
         headExp.rotation.z=Math.PI/2; headExp.position.set(0,10.8,-1.5); group.add(headExp);
@@ -289,58 +378,62 @@
         pipe([new THREE.Vector3(4,HEAD_Y,-1), new THREE.Vector3(4,11.5,0)], matDry);
         pipe([new THREE.Vector3(4,11.5,0), new THREE.Vector3(4,10.8,0), new THREE.Vector3(4,10.8,-1.5)], matMix);
         const servo = new THREE.Mesh(new THREE.SphereGeometry(0.5), new THREE.MeshStandardMaterial({color:0xef4444}));
-        servo.position.set(4,11.5,0); addMeta(servo, "Servoválvula de Mezcla", "Actuador proporcional. Combina flujos seco y húmedo para lograr el %HR objetivo."); group.add(servo);
+        servo.position.set(4,11.5,0); addMeta(servo, "Servoválvula de Mezcla", "Combina flujos para lograr el %HR objetivo."); group.add(servo);
         const ard = new THREE.Mesh(new THREE.BoxGeometry(0.8,1,0.3), new THREE.MeshStandardMaterial({color:0x3b82f6}));
-        ard.position.set(4.8,11.5,0); addMeta(ard, "Controlador (Arduino)", "Sistema de lazo cerrado. Monitorea sensores y ajusta la servoválvula para mantener 40-60% HR estable."); group.add(ard);
+        ard.position.set(4.8,11.5,0); addMeta(ard, "Controlador (Arduino)", "Sistema de lazo cerrado PID."); group.add(ard);
 
         function cell(x, front, idx) {
             const z = front ? 1.5 : -1.5;
             const cyl = new THREE.Mesh(new THREE.CylinderGeometry(1,1,3,32,1,true), matAcrylic);
             cyl.position.set(x,7.7,z); cyl.castShadow=true;
             const type = front ? "Celda ASTM" : "Celda Experimental";
-            const desc = front ? "Ciclo Estándar: Oxidación forzada mediante alternancia brusca de ambientes seco/húmedo." : "Ciclo Controlado: Evaluación cinética bajo condiciones de humedad realistas (40-60%) de pila.";
-            addMeta(cyl, `${type} - Muestra ${idx+1}`, desc); group.add(cyl);
+            addMeta(cyl, `${type} - Muestra ${idx+1}`, front ? "Ciclo Estándar: Oxidación forzada." : "Ciclo Controlado: Evaluación cinética realista."); group.add(cyl);
             const soil = new THREE.Mesh(new THREE.CylinderGeometry(0.98,0.98,1.5,32), tailingMats[idx]);
-            soil.position.set(x,7.5,z); soil.castShadow=true; group.add(soil);
+            soil.position.set(x,7.5,z); group.add(soil);
             const lid = new THREE.Mesh(new THREE.CylinderGeometry(1.1,1.1,0.2,32), matRack);
             lid.position.set(x,9.2,z); group.add(lid);
             const v = new THREE.Mesh(new THREE.CylinderGeometry(0.15,0.15,0.4,16), new THREE.MeshStandardMaterial({color:0xef4444}));
-            v.rotation.x=Math.PI/2; v.position.set(x,10.8,z+(front?0.2:-0.2)); addMeta(v, "Válvula de Ajuste Fino", "Equilibra la impedancia neumática para asegurar que todas las celdas reciban exactamente 2 L/min."); group.add(v);
+            v.rotation.x=Math.PI/2; v.position.set(x,10.8,z+(front?0.2:-0.2)); addMeta(v, "Válvula de Ajuste Fino", "Equilibra la impedancia neumática."); group.add(v);
             pipe([new THREE.Vector3(x,10.8,z), new THREE.Vector3(x,9.4,z)], front?matAstm:matMix);
             const bot = new THREE.Mesh(new THREE.CylinderGeometry(0.6,0.6,1.5,16), new THREE.MeshStandardMaterial({color:0xfff9c4, opacity:0.6, transparent:true}));
-            bot.position.set(x,1.25,z); bot.castShadow=true; addMeta(bot, "Botella de Recolección", "Almacena la solución de lavado semanal para su posterior análisis químico (ICP-MS, pH, etc)."); group.add(bot);
+            bot.position.set(x,1.25,z); bot.castShadow=true; addMeta(bot, "Botella de Recolección", "Almacena lixiviados para análisis."); group.add(bot);
             const hose = new THREE.TubeGeometry(new THREE.CatmullRomCurve3([new THREE.Vector3(x,6.2,z), new THREE.Vector3(x,2,z)]), 8, 0.04, 8, false);
             group.add(new THREE.Mesh(hose, new THREE.MeshPhysicalMaterial({color:0xffffff, opacity:0.4, transparent:true})));
         }
+        for(let i=0; i<5; i++) { cell(-5 + (i*2.5), true, i); cell(-5 + (i*2.5), false, i); }
 
-        for(let i=0; i<5; i++) {
-            cell(-5 + (i*2.5), true, i);
-            cell(-5 + (i*2.5), false, i);
-        }
-
-        // RAYCASTER
         const raycaster = new THREE.Raycaster();
         const mouse = new THREE.Vector2();
         const tooltip = document.getElementById('tooltip');
         const ttTitle = document.getElementById('tt-title');
         const ttDesc = document.getElementById('tt-desc');
         
-        window.addEventListener('mousemove', (e) => {
-            mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
-            mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+        function checkIntersections(x, y) {
+            mouse.x = (x / window.innerWidth) * 2 - 1;
+            mouse.y = -(y / window.innerHeight) * 2 + 1;
             raycaster.setFromCamera(mouse, camera);
             const intersects = raycaster.intersectObjects(group.children);
+            
             if(intersects.length > 0 && intersects[0].object.userData.isInteractive) {
                 document.body.style.cursor = 'help';
                 tooltip.style.opacity = 1;
-                tooltip.style.transform = `translate(${e.clientX + 20}px, ${e.clientY + 20}px)`;
+                let topPos = y + 20;
+                let leftPos = x + 20;
+                if(x > window.innerWidth * 0.6) leftPos = x - 220; 
+                tooltip.style.transform = `translate(${leftPos}px, ${topPos}px)`;
                 ttTitle.innerText = intersects[0].object.userData.name;
                 ttDesc.innerText = intersects[0].object.userData.desc;
                 controls.autoRotate = false;
             } else {
                 document.body.style.cursor = 'default';
                 tooltip.style.opacity = 0;
-                if(btnText.innerText === "PAUSAR ROTACIÓN") controls.autoRotate = true;
+                if(btnText.innerText === "PAUSAR") controls.autoRotate = true;
+            }
+        }
+        window.addEventListener('mousemove', (e) => checkIntersections(e.clientX, e.clientY));
+        window.addEventListener('touchstart', (e) => {
+            if(e.touches.length > 0) {
+                checkIntersections(e.touches[0].clientX, e.touches[0].clientY);
             }
         });
 
@@ -349,7 +442,12 @@
             controls.update();
             renderer.render(scene, camera);
         }
-        window.addEventListener('resize', () => { camera.aspect = window.innerWidth/window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth,window.innerHeight); });
+        window.addEventListener('resize', () => { 
+            camera.aspect = window.innerWidth/window.innerHeight; 
+            camera.updateProjectionMatrix(); 
+            renderer.setSize(window.innerWidth,window.innerHeight); 
+            setCameraPos(); // Recalcular posición al cambiar tamaño
+        });
         animate();
     </script>
 </body>
