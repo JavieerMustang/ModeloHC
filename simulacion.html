@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulación ASTM D5744 - Celda de Humedad</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #F8FAFC;
+            overflow: hidden;
+            margin: 0;
+            padding: 0;
+        }
+
+        .main-container {
+            display: flex;
+            width: 100vw;
+            height: 100vh;
+            padding: 2rem;
+            box-sizing: border-box;
+            gap: 2rem;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .content-box {
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            width: 100%;
+            max-width: 1400px;
+            height: 90vh;
+            /* Fixed height relative to viewport */
+            display: flex;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+        }
+
+        /* --- DIAGRAM SCALING CONTAINER --- */
+        .diagram-panel {
+            flex: 2;
+            background-color: #f8fafc;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* The canvas that holds everything at fixed coordinates */
+        .cell-wrapper {
+            position: relative;
+            width: 650px;
+            height: 700px;
+            /* Origin set for scaling */
+            transform-origin: center center;
+            /* Will be scaled by JS */
+        }
+
+        /* --- FIXED COORDINATE SYSTEM --- */
+        /* Origin 0,0 is top-left of cell-wrapper */
+
+        /* Cylinder: Center X ~ 325 */
+        .cylinder {
+            position: absolute;
+            top: 150px;
+            left: 210px;
+            width: 230px;
+            height: 380px;
+            border: 4px solid #334155;
+            border-radius: 6px;
+            background: linear-gradient(90deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.7));
+            z-index: 10;
+            /* Base Layer */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Internal Components */
+        .sample {
+            position: absolute;
+            top: 100px;
+            left: 0;
+            width: 100%;
+            height: 220px;
+            background-image: radial-gradient(#94a3b8 15%, transparent 16%);
+            background-size: 10px 10px;
+            background-position: 0 0;
+            opacity: 0.3;
+        }
+
+        .perforated-plate {
+            position: absolute;
+            top: 320px;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            border-top: 4px dashed #334155;
+        }
+
+        /* Ports - Z-Index adjustments */
+        /* Top Port (Air Out) - Must be BEHIND cylinder if strictly physically accurate, 
+           BUT for diagram clarity, the label must be ON TOP. */
+        .port {
+            position: absolute;
+            background: #94A3B8;
+            border: 2px solid #475569;
+            z-index: 5;
+        }
+
+        .port-top {
+            top: 120px;
+            left: 315px;
+            width: 20px;
+            height: 30px;
+        }
+
+        .port-side-bottom {
+            top: 490px;
+            left: 180px;
+            width: 30px;
+            height: 16px;
+        }
+
+        .port-side-top {
+            top: 170px;
+            left: 440px;
+            width: 30px;
+            height: 16px;
+        }
+
+        .port-funnel {
+            top: 530px;
+            left: 310px;
+            width: 30px;
+            height: 20px;
+            border-radius: 0 0 10px 10px;
+        }
+
+
+        /* LABELS & ARROWS - High Z-Index to floats above everything */
+        .tag {
+            position: absolute;
+            padding: 6px 10px;
+            background: white;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #334155;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+            /* SUPER TOP */
+            white-space: nowrap;
+        }
+
+        .tag-line {
+            position: absolute;
+            height: 2px;
+            background: #94a3b8;
+            z-index: 90;
+        }
+
+        /* Component Tags */
+        .tag-tubo {
+            top: 160px;
+            left: 480px;
+        }
+
+        .line-tubo {
+            top: 172px;
+            left: 440px;
+            width: 40px;
+        }
+
+        .tag-muestra {
+            top: 250px;
+            left: 480px;
+        }
+
+        .line-muestra {
+            top: 262px;
+            left: 440px;
+            width: 40px;
+        }
+
+        .tag-placa {
+            top: 460px;
+            left: 480px;
+        }
+
+        .line-placa {
+            top: 472px;
+            left: 440px;
+            width: 40px;
+        }
+
+        /* Flow Indicators - Wrapper divs for arrow + label */
+        .flow-indicator {
+            position: absolute;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            z-index: 100;
+            /* SUPER TOP */
+            transition: all 0.5s ease;
+            opacity: 0;
+            /* Hidden by default */
+        }
+
+        .flow-label {
+            font-size: 0.85rem;
+            font-weight: 700;
+            padding: 6px 10px;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            white-space: nowrap;
+        }
+
+        /* 4. Air In: Left Side */
+        #arr-in {
+            top: 482px;
+            left: 40px;
+            transform: translateX(-20px);
+        }
+
+        /* 5. Air Out: Top Side - MOVED HIGHER TO AVOID OVERLAP */
+        #arr-out {
+            top: 50px;
+            left: 290px;
+            flex-direction: column;
+            transform: translateY(-20px);
+        }
+
+        /* 6. Water In: Right Side */
+        #arr-water {
+            top: 162px;
+            left: 475px;
+            transform: translateX(20px);
+        }
+
+        /* 7. Leachate: Bottom */
+        #arr-leach {
+            top: 560px;
+            left: 295px;
+            flex-direction: column;
+            transform: translateY(20px);
+        }
+
+        /* ACTIVE STATES (Controlled by JS) */
+        .flow-indicator.active {
+            opacity: 1;
+            transform: translate(0, 0) !important;
+        }
+
+        /* Visual Effects inside Cylinder */
+        .air-stream {
+            position: absolute;
+            bottom: 40px;
+            left: 10px;
+            right: 10px;
+            height: 280px;
+            background: repeating-linear-gradient(0deg, transparent, transparent 10px, rgba(255, 255, 255, 0.5) 10px, rgba(255, 255, 255, 0.5) 20px);
+            opacity: 0;
+            pointer-events: none;
+            mask-image: linear-gradient(to top, black, transparent);
+        }
+
+        /* Mode Colors */
+        .mode-dry .air-stream {
+            background: repeating-linear-gradient(0deg, transparent, transparent 20px, rgba(239, 68, 68, 0.15) 20px, rgba(239, 68, 68, 0.15) 40px);
+            animation: flowUp 1.5s linear infinite;
+            opacity: 1;
+        }
+
+        .mode-wet .air-stream {
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.2) 0%, transparent 70%);
+            background-size: 100% 30px;
+            animation: flowUp 3s linear infinite;
+            opacity: 1;
+        }
+
+        .water-jet {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(180deg, rgba(14, 165, 233, 0.4) 0%, transparent 100%);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .mode-rinse .water-jet {
+            opacity: 1;
+            animation: heavyRain 0.8s infinite linear;
+        }
+
+
+        @keyframes flowUp {
+            from {
+                background-position: 0 0;
+            }
+
+            to {
+                background-position: 0 -40px;
+            }
+        }
+
+        @keyframes heavyRain {
+            0% {
+                background-position: 0 0;
+                opacity: 0.4;
+            }
+
+            100% {
+                background-position: 0 40px;
+                opacity: 0.4;
+            }
+        }
+
+        /* Left Panel - Fixed width */
+        .control-panel {
+            flex: 1;
+            min-width: 350px;
+            max-width: 450px;
+            background: #f8fafc;
+            padding: 2rem;
+            border-right: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            z-index: 20;
+            height: 100%;
+        }
+
+        .day-btn {
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        .day-btn:active {
+            transform: scale(0.95);
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.8rem;
+            color: #475569;
+            margin-bottom: 8px;
+        }
+
+        .legend-dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="main-container">
+        <div class="content-box">
+
+            <!-- LEFT PANEL -->
+            <div class="control-panel">
+                <div class="mb-6">
+                    <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Protocolo
+                        Experimental</span>
+                    <h1 class="text-4xl font-bold text-slate-800 leading-tight mt-1">ASTM D5744</h1>
+                    <p class="text-base text-slate-500 mt-2">Simulación de ciclos de meteorización acelerada.</p>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-lg mb-6 relative overflow-hidden transition-colors duration-500 h-48 flex flex-col justify-center"
+                    id="status-card">
+                    <div class="absolute top-0 right-0 p-6 opacity-10">
+                        <i id="status-icon" class="ri-sun-line text-7xl"></i>
+                    </div>
+                    <h2 id="phase-title" class="text-xl font-bold text-slate-800 mb-2 relative z-10">Esperando...</h2>
+                    <p id="phase-desc" class="text-sm text-slate-600 relative z-10 leading-relaxed">Seleccione un día o
+                        inicie el ciclo automático.</p>
+                </div>
+
+                <!-- DAYS -->
+                <div class="flex gap-2 mb-6 justify-center w-full">
+                    <div class="flex flex-col items-center gap-1 day-btn" onclick="manualJump(1)">
+                        <div id="d1"
+                            class="w-10 h-10 rounded-lg bg-slate-200 flex items-center justify-center font-bold text-slate-400 text-base">
+                            1</div>
+                        <span class="text-[9px] uppercase font-bold text-slate-400">Seco</span>
+                    </div>
+                    <div class="flex flex-col items-center gap-1 day-btn" onclick="manualJump(2)">
+                        <div id="d2"
+                            class="w-10 h-10 rounded-lg bg-slate-200 flex items-center justify-center font-bold text-slate-400 text-base">
+                            2</div>
+                    </div>
+                    <div class="flex flex-col items-center gap-1 day-btn" onclick="manualJump(3)">
+                        <div id="d3"
+                            class="w-10 h-10 rounded-lg bg-slate-200 flex items-center justify-center font-bold text-slate-400 text-base">
+                            3</div>
+                    </div>
+                    <div class="w-px bg-slate-300 h-8 mt-1"></div>
+                    <div class="flex flex-col items-center gap-1 day-btn" onclick="manualJump(4)">
+                        <div id="d4"
+                            class="w-10 h-10 rounded-lg bg-slate-200 flex items-center justify-center font-bold text-slate-400 text-base">
+                            4</div>
+                        <span class="text-[9px] uppercase font-bold text-slate-400">Hum</span>
+                    </div>
+                    <div class="flex flex-col items-center gap-1 day-btn" onclick="manualJump(5)">
+                        <div id="d5"
+                            class="w-10 h-10 rounded-lg bg-slate-200 flex items-center justify-center font-bold text-slate-400 text-base">
+                            5</div>
+                    </div>
+                    <div class="flex flex-col items-center gap-1 day-btn" onclick="manualJump(6)">
+                        <div id="d6"
+                            class="w-10 h-10 rounded-lg bg-slate-200 flex items-center justify-center font-bold text-slate-400 text-base">
+                            6</div>
+                    </div>
+                    <div class="w-px bg-slate-300 h-8 mt-1"></div>
+                    <div class="flex flex-col items-center gap-1 day-btn" onclick="manualJump(7)">
+                        <div id="d7"
+                            class="w-10 h-10 rounded-lg bg-slate-200 flex items-center justify-center font-bold text-slate-400 text-base">
+                            7</div>
+                        <span class="text-[9px] uppercase font-bold text-slate-400">Lava</span>
+                    </div>
+                </div>
+
+                <!-- CONTROLS -->
+                <div class="flex gap-4 mt-auto">
+                    <button onclick="nextStep()"
+                        class="flex-1 bg-white border-2 border-slate-200 hover:border-slate-300 text-slate-700 font-bold py-4 rounded-xl shadow-sm transition-all flex items-center justify-center gap-2 active:scale-95">
+                        <i class="ri-skip-forward-fill text-xl"></i> +1 DÍA
+                    </button>
+                    <button onclick="toggleSimulation()" id="btn-toggle"
+                        class="flex-1 bg-slate-800 hover:bg-slate-700 text-white font-bold py-4 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 active:scale-95">
+                        <i class="ri-play-fill text-xl"></i> <span id="btn-text">AUTO</span>
+                    </button>
+                </div>
+
+                <!-- LEGEND -->
+                <div class="mt-4 bg-white p-4 rounded-lg border border-slate-100 shadow-sm">
+                    <div class="grid grid-cols-2 gap-2 text-xs">
+                        <div class="legend-item">
+                            <div class="legend-dot bg-red-500"></div> Aire Seco
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-dot bg-blue-500"></div> Aire Húmedo
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-dot bg-teal-500"></div> Agua Lavado
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-dot bg-amber-600"></div> Lixiviado
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT PANEL - DIAGRAM -->
+            <div class="diagram-panel" id="diagram-container">
+                <div class="absolute inset-0 opacity-20"
+                    style="background-image: radial-gradient(#94a3b8 1px, transparent 1px); background-size: 25px 25px;">
+                </div>
+
+                <div class="cell-wrapper" id="diagram-wrapper">
+
+                    <!-- LABELS -->
+                    <div class="tag tag-tubo">Tubo Acrílico</div>
+                    <div class="tag-line line-tubo"></div>
+                    <div class="tag tag-muestra">Muestra Relave</div>
+                    <div class="tag-line line-muestra"></div>
+                    <div class="tag tag-placa">Placa Perforada</div>
+                    <div class="tag-line line-placa"></div>
+
+                    <!-- PORTS -->
+                    <div class="port port-top"></div>
+                    <div class="port port-side-bottom"></div>
+                    <div class="port port-side-top"></div>
+                    <div class="port port-funnel"></div>
+
+                    <!-- CYLINDER -->
+                    <div class="cylinder overflow-hidden">
+                        <div id="flow-visual" class="air-stream transition-opacity duration-500"></div>
+                        <div id="rinse-visual" class="water-jet transition-opacity duration-300"></div>
+                        <div class="sample border-t-2 border-slate-300"></div>
+                        <div class="perforated-plate"></div>
+                    </div>
+
+                    <!-- FLOW INDICATORS (Now Top-Level) -->
+
+                    <!-- Air In -->
+                    <div id="arr-in" class="flow-indicator">
+                        <div class="flow-label text-slate-600 bg-white border border-slate-200" id="label-in">Entrada
+                            Aire</div>
+                        <i class="ri-arrow-right-line text-3xl text-slate-500"></i>
+                    </div>
+
+                    <!-- Air Out -->
+                    <div id="arr-out" class="flow-indicator">
+                        <i class="ri-arrow-up-line text-3xl text-slate-400"></i>
+                        <div class="flow-label text-slate-500 bg-white border border-slate-200">Salida Gases</div>
+                    </div>
+
+                    <!-- Water In -->
+                    <div id="arr-water" class="flow-indicator">
+                        <i class="ri-arrow-left-line text-3xl text-teal-500"></i>
+                        <div class="flow-label text-teal-700 bg-teal-50 border border-teal-200 shadow-sm">Agua Lavado
+                        </div>
+                    </div>
+
+                    <!-- Leachate -->
+                    <div id="arr-leach" class="flow-indicator">
+                        <div id="drip-anim"
+                            class="w-4 h-5 bg-amber-600 rounded-full rounded-tl-none -rotate-45 mb-2 shadow-sm"></div>
+                        <div class="flow-label text-amber-700 bg-amber-50 border border-amber-200 shadow-sm">Lixiviado
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let day = 1;
+        let interval;
+        let isRunning = false;
+        const wrapper = document.getElementById('diagram-wrapper');
+        const container = document.getElementById('diagram-container');
+        const DAY_DURATION = 3500;
+
+        // --- RESPONSIVE SCALING LOGIC ---
+        function resizeDiagram() {
+            const padding = 40;
+            const targetW = 650;
+            const targetH = 700;
+            const containerW = container.clientWidth - padding;
+            const containerH = container.clientHeight - padding;
+
+            const scale = Math.min(containerW / targetW, containerH / targetH);
+
+            // Limit max scale to 1.1 to avoid pixelation, min 0.5
+            const finalScale = Math.min(Math.max(scale, 0.4), 1.2);
+
+            wrapper.style.transform = `scale(${finalScale})`;
+        }
+
+        // Listen to resizing
+        window.addEventListener('resize', resizeDiagram);
+        // Initial call
+        resizeDiagram();
+
+
+        // --- SIMULATION LOGIC ---
+
+        function toggleSimulation() {
+            if (isRunning) {
+                clearInterval(interval);
+                document.getElementById('btn-text').textContent = "AUTO";
+                document.querySelector('#btn-toggle i').className = "ri-play-fill text-xl";
+                isRunning = false;
+            } else {
+                interval = setInterval(runCycle, DAY_DURATION);
+                document.getElementById('btn-text').textContent = "PAUSAR";
+                document.querySelector('#btn-toggle i').className = "ri-pause-fill text-xl";
+                isRunning = true;
+            }
+        }
+
+        function runCycle() {
+            if (day > 7) day = 1;
+            updateState(day);
+            day++;
+        }
+
+        function nextStep() {
+            if (isRunning) toggleSimulation();
+            if (day > 7) day = 1;
+            updateState(day);
+            day++;
+        }
+
+        function manualJump(targetDay) {
+            if (isRunning) toggleSimulation();
+            day = targetDay;
+            updateState(day);
+            day++;
+        }
+
+        function updateState(d) {
+            document.querySelectorAll('[id^="d"]').forEach(el => {
+                el.className = "w-10 h-10 rounded-lg bg-slate-200 flex items-center justify-center font-bold text-slate-400 text-base transition-all";
+            });
+
+            const activeDay = document.getElementById(`d${d}`);
+            let colorClass = "";
+            let phaseName = "";
+
+            if (d <= 3) { phaseName = "dry"; colorClass = "bg-red-500 text-white shadow-xl shadow-red-200 scale-110"; }
+            else if (d <= 6) { phaseName = "wet"; colorClass = "bg-blue-500 text-white shadow-xl shadow-blue-200 scale-110"; }
+            else { phaseName = "rinse"; colorClass = "bg-teal-500 text-white shadow-xl shadow-teal-200 scale-110"; }
+
+            activeDay.className = `w-10 h-10 rounded-lg flex items-center justify-center font-bold text-base transition-all ${colorClass}`;
+
+            setPhaseVisuals(phaseName);
+        }
+
+        function setPhaseVisuals(phase) {
+            const title = document.getElementById('phase-title');
+            const desc = document.getElementById('phase-desc');
+            const card = document.getElementById('status-card');
+            const icon = document.getElementById('status-icon');
+
+            // DO NOT CLEAR CLASS, JUST MODIFY
+            resetVisualsState();
+
+            if (phase === 'dry') {
+                title.textContent = "Ciclo de Aire Seco (3 Días)";
+                title.className = "text-xl font-bold text-red-700 mb-2 relative z-10";
+                desc.textContent = "El aire seco ingresa por la parte inferior, permea la muestra y oxida los sulfuros expuestos.";
+                card.className = "bg-red-50 p-6 rounded-2xl border border-red-100 shadow-lg mb-6 relative overflow-hidden transition-colors duration-500 h-48 flex flex-col justify-center";
+                icon.className = "ri-fire-line text-8xl text-red-200";
+
+                wrapper.classList.add('mode-dry');
+                wrapper.classList.remove('mode-wet', 'mode-rinse');
+
+                showElement('arr-in', true);
+                showElement('arr-out', true);
+                const labelIn = document.getElementById('label-in');
+                labelIn.textContent = "Aire Seco";
+                labelIn.className = "flow-label text-red-600 bg-white border border-red-100 shadow-sm";
+            }
+            else if (phase === 'wet') {
+                title.textContent = "Ciclo de Aire Húmedo (3 Días)";
+                title.className = "text-xl font-bold text-blue-700 mb-2 relative z-10";
+                desc.textContent = "El aire saturado hidrata los poros de la muestra, disolviendo las sales formadas.";
+                card.className = "bg-blue-50 p-6 rounded-2xl border border-blue-100 shadow-lg mb-6 relative overflow-hidden transition-colors duration-500 h-48 flex flex-col justify-center";
+                icon.className = "ri-drop-line text-8xl text-blue-200";
+
+                wrapper.classList.add('mode-wet');
+                wrapper.classList.remove('mode-dry', 'mode-rinse');
+
+                showElement('arr-in', true);
+                showElement('arr-out', true);
+                const labelIn = document.getElementById('label-in');
+                labelIn.textContent = "Aire Húmedo";
+                labelIn.className = "flow-label text-blue-600 bg-white border border-blue-100 shadow-sm";
+            }
+            else {
+                title.textContent = "Lavado / Flushing (Día 7)";
+                title.className = "text-xl font-bold text-teal-800 mb-2 relative z-10";
+                desc.textContent = "Se agrega agua desionizada para remover productos oxidados solubles.";
+                card.className = "bg-teal-50 p-6 rounded-2xl border border-teal-100 shadow-lg mb-6 relative overflow-hidden transition-colors duration-500 h-48 flex flex-col justify-center";
+                icon.className = "ri-showers-line text-8xl text-teal-200";
+
+                wrapper.classList.add('mode-rinse');
+                wrapper.classList.remove('mode-dry', 'mode-wet');
+
+                showElement('arr-water', true);
+                // Delay set by transition, but we trigger active straight away
+                // Maybe a slight delay for logic purity
+                setTimeout(() => showElement('arr-leach', true), 300);
+            }
+        }
+
+        function resetVisualsState() {
+            showElement('arr-in', false);
+            showElement('arr-out', false);
+            showElement('arr-water', false);
+            showElement('arr-leach', false);
+        }
+
+        function showElement(id, show) {
+            const el = document.getElementById(id);
+            if (show) {
+                el.classList.add('active');
+            } else {
+                el.classList.remove('active');
+            }
+        }
+
+    </script>
+</body>
+
+</html>

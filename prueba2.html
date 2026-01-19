@@ -1,0 +1,547 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <title>Defensa TIF 2026 - Javier Muñoz</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.4/reset.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.4/reveal.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.4/theme/white.min.css">
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        /* --- ESTILO CIENTÍFICO UDEC (v11 Ajustado) --- */
+        :root {
+            --primary: #003366;
+            /* Azul Académico UdeC */
+            --accent: #D97706;
+            /* Dorado Ocre (Geomet) */
+            --text: #1E293B;
+            /* Gris Pizarra */
+            --bg-accent: #F1F5F9;
+            /* Gris muy suave para cajas */
+        }
+
+        body {
+            background-color: #F8FAFC;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .reveal {
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Centered Content */
+        .reveal .slides>section,
+        .reveal .slides>section>section {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        /* Typography */
+        .reveal h1,
+        .reveal h2,
+        .reveal h3 {
+            font-family: 'Inter', sans-serif;
+            text-transform: none;
+            letter-spacing: -0.02em;
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        /* Section Header */
+        .section-header {
+            text-align: left;
+            margin-bottom: 30px !important;
+            border-bottom: 3px solid var(--accent);
+            padding-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .section-number {
+            background: var(--primary);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 0.35em;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .section-title {
+            font-size: 1.8em !important;
+            font-weight: 900 !important;
+            margin: 0 !important;
+        }
+
+        /* Layouts */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            align-items: flex-start;
+            text-align: left;
+        }
+
+        /* Cards & Boxes */
+        .card {
+            background: var(--bg-accent);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        .science-box {
+            border-left: 4px solid var(--accent);
+            background: #FFFBEB;
+            padding: 15px;
+            margin-bottom: 15px;
+            font-size: 0.85em;
+        }
+
+        /* Text */
+        p,
+        li {
+            font-size: 0.9em;
+            line-height: 1.5;
+            color: #334155;
+            text-align: justify;
+        }
+
+        strong {
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        /* Slide Number */
+        .reveal .slide-number {
+            font-family: 'Inter';
+            font-weight: 800;
+            font-size: 18px !important;
+            color: var(--primary) !important;
+            background: transparent !important;
+            bottom: 15px !important;
+            left: 15px !important;
+        }
+
+        /* Iframe */
+        .iframe-container {
+            width: 100%;
+            height: 60vh;
+            border: 2px solid #E2E8F0;
+            border-radius: 12px;
+            overflow: hidden;
+            background: white;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* Logo */
+        .logo-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            margin-bottom: 30px;
+        }
+
+        .logo-img {
+            height: 80px;
+            width: auto;
+            mix-blend-mode: multiply;
+        }
+
+        /* Button */
+        .btn-launch {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--primary);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-weight: 600;
+            text-decoration: none;
+            font-size: 0.75em;
+            transition: transform 0.2s;
+        }
+
+        .btn-launch:hover {
+            background: var(--accent);
+            transform: scale(1.05);
+            color: white;
+        }
+
+        /* Fix Tailwind */
+        .reveal ul,
+        .reveal ol {
+            margin-bottom: 1em;
+            padding-left: 1.5em;
+            list-style: disc;
+        }
+
+        .reveal li {
+            margin-bottom: 0.5em;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="reveal">
+        <div class="slides">
+
+            <!-- 01. PORTADA -->
+            <section>
+                <div class="logo-container">
+                    <img src="logo_udec.png" class="logo-img" alt="UdeC">
+                    <img src="logo_gea.png" class="logo-img" alt="GEA">
+                </div>
+
+                <div style="text-align: left; padding: 0 20px;">
+                    <div
+                        style="color: var(--accent); font-weight: 800; letter-spacing: 2px; font-size: 0.7em; margin-bottom: 15px;">
+                        SOLICITUD DE APROBACIÓN DE TEMA DE TIF
+                    </div>
+
+                    <h1 style="font-size: 1.8em; font-weight: 900; line-height: 1.2; margin-bottom: 25px;">
+                        Implementación de laboratorio de celdas de humedad: Evaluación de la cinética de oxidación de
+                        sulfuros y generación de drenaje ácido en relaves mineros
+                    </h1>
+
+                    <div
+                        style="margin-top: 50px; display: grid; grid-template-columns: auto auto; gap: 40px; font-size: 0.85em;">
+                        <div>
+                            <span
+                                style="display:block; font-size:0.7em; text-transform:uppercase; color:#94A3B8; font-weight:700;">Estudiante</span>
+                            <strong>Javier Muñoz Ambiado</strong>
+                        </div>
+                        <div>
+                            <span
+                                style="display:block; font-size:0.7em; text-transform:uppercase; color:#94A3B8; font-weight:700;">Docente
+                                Guía</span>
+                            <strong>Dra. Javiera Gerding González</strong>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 02. HIPÓTESIS -->
+            <section>
+                <div class="section-header">
+                    <span class="section-number">02</span>
+                    <h2 class="section-title">Hipótesis</h2>
+                </div>
+                <div class="card fragment fade-up">
+                    <p style="font-size: 1.2em; font-weight: 500; text-align: center; color: var(--primary);">
+                        "La implementación de un sistema de Celdas de Humedad, diseñado bajo los principios de la norma
+                        ASTM D5744 pero con mejoras operativas en el control de flujo y saturación, permitirá obtener
+                        tasas de lixiviación reproducibles y representativas."
+                    </p>
+                </div>
+            </section>
+
+            <!-- 03. FUNDAMENTO CIENTÍFICO (Insertado) -->
+            <section>
+                <div class="section-header">
+                    <span class="section-number">03</span>
+                    <h2 class="section-title">Fundamento Científico</h2>
+                </div>
+
+                <div class="grid-2" style="gap: 20px;">
+                    <div class="card">
+                        <h3 style="font-size: 1.1em; color: var(--primary); margin-bottom: 10px;"><i
+                                class="ri-book-mark-fill"></i> Norma ASTM D5744-18</h3>
+                        <p style="font-size: 0.85em;">Diseñada para climas templados, impone un ciclo rígido de 7 días
+                            con lavado obligatorio.</p>
+                        <div class="science-box" style="margin-top: 15px; border-color: #EF4444; background: #FEF2F2;">
+                            <strong style="color: #EF4444;">Limitación:</strong> El lavado semanal remueve
+                            artificialmente los productos de oxidación, impidiendo la formación de costras salinas
+                            típicas de climas áridos.
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3 style="font-size: 1.1em; color: var(--accent); margin-bottom: 10px;"><i
+                                class="ri-article-fill"></i> Enfoque Geometalúrgico</h3>
+                        <p style="font-size: 0.85em;"><strong>Parbhakar-Fox et al. (2013):</strong> La microtextura y el
+                            grado de liberación mineral gobiernan la reactividad.</p>
+                        <p style="font-size: 0.85em; margin-top: 10px;"><strong>Dold (2014):</strong> En hiperaridez, la
+                            alta evaporación invierte el flujo hídrico, concentrando sales en superficie ("Store &
+                            Release").</p>
+                        <blockquote
+                            style="font-size: 0.8em; font-style: italic; background: white; padding: 10px; border-radius: 8px; border: 1px solid #E2E8F0; margin: 10px 0;">
+                            "Las costras tienen un comportamiento dual: liberan carga contaminante súbita (First Flush)
+                            o pasivan la oxidación (Hardpans)." (Kossoff et al., 2012)
+                        </blockquote>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 04. OBJETIVOS -->
+            <section>
+                <div class="section-header">
+                    <span class="section-number">04</span>
+                    <h2 class="section-title">Objetivos</h2>
+                </div>
+
+                <div class="fragment fade-right"
+                    style="background: var(--primary); color: white; padding: 20px; border-radius: 12px; margin-bottom: 25px; text-align: left;">
+                    <h3
+                        style="color: var(--accent); font-size: 0.8em; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px;">
+                        Objetivo General</h3>
+                    <p style="font-size: 1em; line-height: 1.4; margin: 0; color: white;">
+                        Implementar laboratorio piloto de celdas de humedad de doble vía para evaluar la cinética de
+                        oxidación de sulfuros y la generación de drenaje ácido asociado a la formación de costras
+                        eflorescentes.
+                    </p>
+                </div>
+
+                <div class="card">
+                    <h4 style="font-size: 1em; margin-bottom: 15px; color: var(--text);">Objetivos Específicos</h4>
+                    <ol style="font-size: 0.9em; padding-left: 20px;">
+                        <li class="fragment fade-up">Diseñar, construir y ensamblar la plataforma piloto de las 10
+                            celdas de ensayo, validando la estabilidad hidrodinámica del diseño.</li>
+                        <li class="fragment fade-up">Ejecutar campaña comparativa flexible: set de control (ASTM) vs set
+                            experimental (sin lavado) para inducir costras.</li>
+                        <li class="fragment fade-up">Caracterización del material de alimentación y evolución de los
+                            relaves (costras vs línea ASTM).</li>
+                        <li class="fragment fade-up">Integración de los resultados para validar la operatividad y
+                            comprender la evolución mineral.</li>
+                    </ol>
+                </div>
+            </section>
+
+            <!-- 05. METODOLOGÍA (Update from DOCX) -->
+            <section>
+                <div class="section-header">
+                    <span class="section-number">05</span>
+                    <h2 class="section-title">Metodología Experimental</h2>
+                </div>
+
+                <div class="grid-2">
+                    <div>
+                        <div class="fragment fade-right mb-4">
+                            <h3 style="font-size: 1em; margin-bottom: 5px; color: var(--primary);">Etapa 1: Ingeniería y
+                                Manufactura</h3>
+                            <ul style="font-size: 0.8em;">
+                                <li><strong>Celdas:</strong> 10 columnas acrílico (200mm x 300mm) con cámara Plenum.
+                                </li>
+                                <li><strong>Fluidos:</strong> Manifold con válvulas 3 vías.</li>
+                                <li><strong>Control Humedad:</strong> Aire 0% vs 100% HR. Objetivo sustrato 30-40%
+                                    humedad.</li>
+                                <li><strong>Línea A (Normada):</strong> Ciclo ASTM 7 días (Seco/Húmedo/Lavado).</li>
+                                <li><strong>Línea B (Flexible):</strong> Control flexible para contrastar condiciones
+                                    (ej. sin lavado).</li>
+                            </ul>
+                        </div>
+                        <div class="fragment fade-right" style="display: flex; gap: 15px;">
+                            <a href="index.html" target="_blank" class="btn-launch">
+                                <i class="ri-box-3-fill"></i> VER MODELO 3D
+                            </a>
+                            <a href="simulacion.html" target="_blank" class="btn-launch"
+                                style="background: var(--accent);">
+                                <i class="ri-play-circle-line"></i> VER SIMULACIÓN 2D
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="fragment fade-left mb-4">
+                            <h3 style="font-size: 1em; margin-bottom: 5px; color: var(--accent);">Etapa 2: Selección y
+                                Caracterización</h3>
+                            <ul style="font-size: 0.8em;">
+                                <li><strong>Muestras:</strong> 5 relaves nacionales.</li>
+                                <li><strong>Análisis:</strong> Test ABA, pH pasta, QEMSCAN/DRX, Porosidad
+                                    (Interpartícula/Macro).</li>
+                            </ul>
+                        </div>
+                        <div class="fragment fade-left mb-4">
+                            <h3 style="font-size: 1em; margin-bottom: 5px; color: var(--primary);">Etapa 3: Ciclos
+                                Cinéticos</h3>
+                            <p style="font-size: 0.8em;">Uso de panel de distribución neumática para operar flujos
+                                diferenciados (seco/saturado).</p>
+                        </div>
+                        <div class="fragment fade-left">
+                            <h3 style="font-size: 1em; margin-bottom: 5px; color: var(--accent);">Etapa 4: Monitoreo
+                            </h3>
+                            <p style="font-size: 0.8em;">Registro de eflorescencias, química de lixiviados e
+                                interpretación.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 06. GANTT CHART (Iframe to GanttFINAL.HTML) -->
+            <section>
+                <div class="section-header">
+                    <span class="section-number">06</span>
+                    <h2 class="section-title">Plan de Trabajo</h2>
+                </div>
+
+                <div class="fragment fade-in">
+                    <p style="margin-bottom: 15px;">
+                        La planificación oficial del proyecto se detalla a continuación:
+                        <br>
+                        <small style="color: var(--accent);">Archivo oficial: GanttFINAL.HTML</small>
+                    </p>
+                    <div class="iframe-container">
+                        <iframe src="GanttFINAL.HTML" title="Carta Gantt"></iframe>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 07. FINANCIAMIENTO (Update from DOCX) -->
+            <section>
+                <div class="section-header">
+                    <span class="section-number">07</span>
+                    <h2 class="section-title">Financiamiento</h2>
+                </div>
+
+                <div
+                    style="background: linear-gradient(135deg, var(--primary) 0%, #0F172A 100%); color: white; padding: 40px; border-radius: 16px; text-align: center;">
+                    <p
+                        style="letter-spacing: 3px; text-transform: uppercase; color: #FFFFFF; font-size: 0.8em; font-weight: 600;">
+                        Proyecto FONDECYT de Iniciación</p>
+                    <h1 style="font-size: 3.5em; color: var(--accent); margin: 15px 0; font-weight: 900;">N° 11241237
+                    </h1>
+                    <hr style="border-color: rgba(255,255,255,0.3); width: 150px; margin: 25px auto;">
+
+                    <div
+                        style="display: flex; justify-content: center; gap: 40px; align-items: center; margin-top: 30px;">
+                        <div>
+                            <small
+                                style="display: block; color: #E2E8F0; text-transform: uppercase; font-size: 0.7em;">Investigadora</small>
+                            <strong style="color: white; font-size: 1.1em;">Dra. Javiera Gerding</strong>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.15); padding: 15px 25px; border-radius: 10px;">
+                            <small
+                                style="display: block; color: #E2E8F0; text-transform: uppercase; font-size: 0.7em;">Inversión
+                                en
+                                Materiales</small>
+                            <strong style="color: var(--accent); font-size: 1.2em;">$6.481.471 CLP</strong>
+                        </div>
+                    </div>
+                    <p
+                        style="font-size: 0.8em; margin-top: 20px; color: #CBD5E1; max-width: 80%; margin-left: auto; margin-right: auto;">
+                        Cobertura: Materiales de construcción, reactivos (ABA/pH) y análisis instrumental (DRX, QEMSCAN,
+                        ICP-MS).
+                    </p>
+                </div>
+            </section>
+
+            <!-- 08. CONCLUSIONES ESPERADAS (Inserted) -->
+            <section>
+                <div class="section-header">
+                    <span class="section-number">08</span>
+                    <h2 class="section-title">Conclusiones Esperadas</h2>
+                </div>
+
+                <div class="grid-2">
+                    <div class="card" style="border-left: 5px solid var(--primary);">
+                        <h3 style="font-size: 1.1em; margin-bottom: 15px;">1. Validación Tecnológica</h3>
+                        <p>El sistema <strong>HC-2026</strong> demostrará que es viable operar protocolos duales
+                            (Estándar + Experimental) con una plataforma de bajo costo y alta precisión.</p>
+                    </div>
+
+                    <div class="card" style="border-left: 5px solid var(--accent);">
+                        <h3 style="font-size: 1.1em; margin-bottom: 15px;">2. Impacto Científico</h3>
+                        <p>Se generará evidencia empírica sobre la discrepancia entre las predicciones ASTM y la
+                            realidad de los ciclos de <em>Store & Release</em> en climas áridos.</p>
+                    </div>
+                </div>
+
+                <div
+                    style="margin-top: 30px; background: #F8FAFC; padding: 20px; border-radius: 12px; border: 1px solid #E2E8F0; text-align: center;">
+                    <h4 style="color: #64748B; font-size: 0.9em; text-transform: uppercase; margin-bottom: 10px;">
+                        Proyección Industrial</h4>
+                    <p style="font-size: 1em; font-weight: 600; color: var(--text);">
+                        "Entregar una herramienta de predicción geoquímica calibrada para la realidad del Norte de
+                        Chile."
+                    </p>
+                </div>
+            </section>
+
+            <!-- 09. REFERENCIAS (Update from DOCX) -->
+            <section>
+                <div class="section-header">
+                    <span class="section-number">09</span>
+                    <h2 class="section-title">Referencias</h2>
+                </div>
+                <div
+                    style="font-size: 0.7em; columns: 2; column-gap: 30px; text-align: left; color: #475569; line-height: 1.4;">
+                    <p><strong>ASTM International. (2018).</strong> ASTM D5744-18: Standard Test Method for Laboratory
+                        Weathering of Solid Materials Using a Humidity Cell.</p>
+                    <p><strong>ASTM International. (2018).</strong> ASTM D8187-18: Standard Guide for Interpretation of
+                        Standard Humidity Cell Test Results.</p>
+                    <p><strong>Bouzahzah, H., et al. (2015).</strong> ASTM normalized humidity cell kinetic tests:
+                        protocol improvements... <em>Mine Water and the Environment</em>.</p>
+                    <p><strong>Dold, B. (2014).</strong> Evolution of Acid Mine Drainage Formation in Sulphidic Mine
+                        Tailings. <em>Minerals</em>.</p>
+                    <p><strong>Gerding, J., et al. (2024).</strong> Fractional precipitation of copiapite-halotrichite
+                        efflorescent salts... <em>Journal of Geochemical Exploration</em>.</p>
+                    <p><strong>Gerding, J., et al. (2020).</strong> Climate and pyrite: Two factors to control the
+                        evolution of abandoned tailings.</p>
+                    <p><strong>INAP. (2014).</strong> Global Acid Rock Drainage Guide (GARD Guide).</p>
+                    <p><strong>Kossoff, D., et al. (2012).</strong> Major and trace metal mobility during weathering of
+                        mine tailings.</p>
+                    <p><strong>Parbhakar-Fox, A., et al. (2013).</strong> Evaluating waste rock mineralogy and
+                        microtexture during kinetic testing for improved acid rock drainage prediction.</p>
+                    <p><strong>Plante, B., et al. (2012).</strong> Comparison of three kinetic tests for the prediction
+                        of acid mine drainage generation...</p>
+                    <p><strong>Sapsford, D. J., et al. (2009).</strong> Humidity cell tests for the prediction of acid
+                        rock drainage.</p>
+                </div>
+            </section>
+
+            <!-- CIERRE -->
+            <section>
+                <div class="logo-container">
+                    <img src="logo_udec.png" class="logo-img">
+                    <img src="logo_gea.png" class="logo-img">
+                </div>
+                <div style="text-align: center; margin-top: 60px;">
+                    <h1 style="font-size: 3.5em; font-weight: 900; color: var(--primary);">MUCHAS GRACIAS</h1>
+                    <p style="font-size: 1.3em; color: #64748B;">Quedo atento a sus comentarios.</p>
+                    <div style="margin-top: 50px;">
+                        <strong style="color: var(--text); font-size: 1.1em;">Javier Muñoz Ambiado</strong><br>
+                        <a href="mailto:jmunozambiado@udec.cl"
+                            style="color: var(--primary); text-decoration: none; font-size: 0.9em;">jmunozambiado@udec.cl</a>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.4/reveal.min.js"></script>
+    <script>
+        Reveal.initialize({
+            width: 1920, height: 1080,
+            margin: 0.1,
+            minScale: 0.2, maxScale: 1.5,
+            controls: true, progress: true, center: true, hash: true,
+            slideNumber: 'c/t',
+            transition: 'slide', backgroundTransition: 'fade'
+        });
+    </script>
+</body>
+
+</html>
