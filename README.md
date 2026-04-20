@@ -35,7 +35,7 @@ This repository was developed as part of the Final Integration Work (TIF) for th
 
 **Javier Arturo Muñoz Ambiado**
 * Geologist | Geometallurgy & Spatial Modeling
-* [LinkedIn Profile](https://www.linkedin.com/in/javier-munoz-ambiado) *(Link your actual LinkedIn here)*
+* [LinkedIn Profile](https://www.linkedin.com/in/jmunoz-ambiado) *(Link your actual LinkedIn here)*
 
 ---
 *Built to bridge the gap between advanced mineral characterization and digital engineering.*
